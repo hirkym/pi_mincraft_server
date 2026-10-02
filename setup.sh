@@ -47,7 +47,7 @@ DEBIAN_FRONTEND=noninteractive apt-get install -y \
 
 # Box64 project documentation points Debian-based systems to this prebuilt package repository.
 install -d -m 0755 /usr/share/keyrings
-curl -fsSL https://Pi-Apps-Coders.github.io/box64-debs/KEY.gpg \
+curl --http1.1 --retry 3 --retry-all-errors -fsSL https://Pi-Apps-Coders.github.io/box64-debs/KEY.gpg \
   | gpg --dearmor --yes -o "$BOX64_KEYRING"
 cat > /etc/apt/sources.list.d/box64.sources <<'BOX64_SOURCE'
 Types: deb
@@ -67,10 +67,10 @@ if [[ ! -x "$SERVER_DIR/bedrock_server" ]]; then
   download_page="$(mktemp)"
   server_zip="$(mktemp --suffix=.zip)"
   trap 'rm -f "$download_page" "$server_zip"' EXIT
-  curl -fsSL https://www.minecraft.net/en-us/download/server/bedrock -o "$download_page"
+  curl --http1.1 --retry 3 --retry-all-errors -fsSL https://www.minecraft.net/en-us/download/server/bedrock -o "$download_page"
   download_url="$(grep -Eo 'https://www\.minecraft\.net/bedrockdedicatedserver/bin-linux/bedrock-server-[0-9.]+\.zip' "$download_page" | sed -n '1p')"
   [[ -n "$download_url" ]] || fail "公式ダウンロードページからLinux版のURLを取得できませんでした。"
-  curl -fL "$download_url" -o "$server_zip"
+  curl --http1.1 --retry 3 --retry-all-errors -fL "$download_url" -o "$server_zip"
   unzip -oq "$server_zip" -d "$SERVER_DIR"
   chown -R minecraft:minecraft "$SERVER_DIR"
   chmod u+x "$SERVER_DIR/bedrock_server"
