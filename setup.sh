@@ -57,6 +57,8 @@ Signed-By: /usr/share/keyrings/box64-archive-keyring.gpg
 BOX64_SOURCE
 apt-get update
 DEBIAN_FRONTEND=noninteractive apt-get install -y box64-generic-arm
+BOX64_BIN="$(command -v box64 || true)"
+[[ -n "$BOX64_BIN" ]] || fail "Box64をインストールしましたが、box64コマンドがPATH上に見つかりません。"
 
 if ! id minecraft >/dev/null 2>&1; then
   useradd --system --home-dir "$SERVER_DIR" --shell /usr/sbin/nologin minecraft
@@ -102,7 +104,7 @@ User=minecraft
 Group=minecraft
 WorkingDirectory=${SERVER_DIR}
 Environment=LD_LIBRARY_PATH=.
-ExecStart=/usr/bin/box64 ./bedrock_server
+ExecStart=${BOX64_BIN} ./bedrock_server
 Restart=on-failure
 RestartSec=10
 
